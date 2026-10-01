@@ -21,8 +21,7 @@
         pkgs.stdenvNoCC.mkDerivation {
           inherit pname version;
           src = ./.;
-          nativeBuildInputs = [ py pkgs."poppler-utils" ]
-            ++ pkgs.lib.optional (pkgs ? pdf2djvu) pkgs.pdf2djvu;
+          nativeBuildInputs = [ py pkgs."poppler-utils" ];
           dontConfigure = true;
           buildPhase = ''
             runHook preBuild
@@ -61,7 +60,7 @@
             buildScript = ''
               ${py}/bin/python3 generators/gen_synthetic.py --out "$PWD/out"
               ${py}/bin/python3 generators/gen_archives.py --corpus "$PWD/out"
-              ${py}/bin/python3 generators/gen_documents.py --out "$PWD/out" --pages 40
+              ${py}/bin/python3 generators/gen_documents.py --out "$PWD/out" --pages 40 --skip-djvu
               if command -v rar >/dev/null 2>&1; then
                 ${py}/bin/python3 generators/gen_rar.py --corpus "$PWD/out" || true
               fi
@@ -77,7 +76,7 @@
               ${py}/bin/python3 generators/gen_synthetic.py --out "$PWD/out" --no-large \
                 --classes photo,bookpage,comic
               ${py}/bin/python3 generators/gen_archives.py --corpus "$PWD/out"
-              ${py}/bin/python3 generators/gen_documents.py --out "$PWD/out" --pages 8
+              ${py}/bin/python3 generators/gen_documents.py --out "$PWD/out" --pages 8 --skip-djvu
             '';
           };
         });

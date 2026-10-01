@@ -52,7 +52,7 @@ python3 generators/gen_documents.py --out ./out --pages 40
 # documents/sample_article.md
 # documents/sample_notes.txt
 # documents/sample_book.cbz   — rasterized pages (needs pdftoppm)
-# documents/sample_book.djvu  — only if pdf2djvu is available
+# documents/sample_book.djvu  — only if pdf2djvu is on PATH (not in nixpkgs)
 ```
 
 Raster fixtures also carry a **bottom banner** with class, resolution, and purpose.
