@@ -5,6 +5,17 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
 # benchtoo
 
+## Repository
+
+https://github.com/Grumbel/benchtoo
+
+```bash
+git clone https://github.com/Grumbel/benchtoo.git
+nix build
+python3 generators/gen_synthetic.py --out ./out --no-large
+```
+
+
 Versioned image fixtures for **thumtoo** / **biltoo** pixel benchmarks.
 Biltoo is largely an **ebook / comic / album** viewer — the matrix includes
 portrait pages, landscape photos, spreads, and comic panels on purpose.
