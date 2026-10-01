@@ -35,6 +35,7 @@
               export PYTHONPATH=${pkgs.lib.escapeShellArg pySite}
               ${py}/bin/python3 -c "import numpy, PIL; print('numpy', numpy.__version__, 'PIL', PIL.__version__)"
               ${py}/bin/python3 generators/gen_synthetic.py --out "$PWD/out"
+              ${py}/bin/python3 generators/gen_archives.py --corpus "$PWD/out"
               runHook postBuild
             '';
             installPhase = ''

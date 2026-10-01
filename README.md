@@ -33,6 +33,17 @@ portrait pages, landscape photos, spreads, and comic panels on purpose.
 `--no-large` drops the largest size in each set. `--with-8k` adds 7680×4320
 for landscape classes only.
 
+## Archives
+
+After synthetics exist:
+
+```bash
+python3 generators/gen_archives.py --corpus ./out
+# out/archives/book_pages.cbz  comic_pages.cbz  mixed_album.zip
+```
+
+ZIP **stored** (no deflate) so extract timing is not dominated by zlib.
+
 ## Build
 
 ```bash
