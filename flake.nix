@@ -10,7 +10,6 @@
         inherit system;
         pkgs = import nixpkgs { inherit system; };
       });
-      # Single env per pkgs — use this interpreter everywhere (PATH python3 is not enough).
       pythonEnv = pkgs:
         pkgs.python3.withPackages (ps: [
           ps.numpy
@@ -20,6 +19,8 @@
       packages = forAllSystems ({ pkgs, system }:
         let
           py = pythonEnv pkgs;
+          # sitePackages path varies by python version; py.sitePackages is e.g. lib/python3.12/site-packages
+          pySite = "${py}/${py.sitePackages}";
         in {
           default = self.packages.${system}.corpus;
           corpus = pkgs.stdenvNoCC.mkDerivation {
@@ -28,10 +29,11 @@
             src = ./.;
             nativeBuildInputs = [ py ];
             dontConfigure = true;
-            # Do not call bare `python3` — it may resolve to an unwrapped interpreter
-            # without site-packages. Always use the withPackages wrapper.
             buildPhase = ''
               runHook preBuild
+              export PYTHONNOUSERSITE=1
+              export PYTHONPATH=${pkgs.lib.escapeShellArg pySite}
+              ${py}/bin/python3 -c "import numpy, PIL; print('numpy', numpy.__version__, 'PIL', PIL.__version__)"
               ${py}/bin/python3 generators/gen_synthetic.py --out "$PWD/out"
               runHook postBuild
             '';
@@ -60,6 +62,8 @@
               set -euo pipefail
               out="''${1:-./out}"
               shift || true
+              export PYTHONNOUSERSITE=1
+              export PYTHONPATH=${pkgs.lib.escapeShellArg "${py}/${py.sitePackages}"}
               exec ${py}/bin/python3 ${./generators/gen_synthetic.py} --out "$out" "$@"
             ''}";
             meta.description = "Regenerate synthetic corpus (content classes) into a directory";
