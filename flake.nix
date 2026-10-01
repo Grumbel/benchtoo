@@ -21,7 +21,7 @@
         pkgs.stdenvNoCC.mkDerivation {
           inherit pname version;
           src = ./.;
-          nativeBuildInputs = [ py pkgs.poppler_utils ]
+          nativeBuildInputs = [ py pkgs."poppler-utils" ]
             ++ pkgs.lib.optional (pkgs ? pdf2djvu) pkgs.pdf2djvu;
           dontConfigure = true;
           buildPhase = ''
