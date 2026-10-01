@@ -3,33 +3,100 @@
   "$id": "https://github.com/Grumbel/pixel-bench-corpus/manifest.schema.json",
   "title": "pixel-bench-corpus manifest",
   "type": "object",
-  "required": ["schema", "entries"],
+  "required": [
+    "schema",
+    "entries"
+  ],
   "properties": {
-    "schema": { "type": "integer", "minimum": 1 },
-    "generator": { "type": "string" },
-    "generator_note": { "type": "string" },
+    "schema": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "generator": {
+      "type": "string"
+    },
+    "generator_note": {
+      "type": "string"
+    },
     "entries": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["id", "path", "class", "width", "height"],
+        "required": [
+          "id",
+          "path",
+          "class",
+          "width",
+          "height"
+        ],
         "properties": {
-          "id": { "type": "string" },
-          "path": { "type": "string" },
+          "id": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
           "class": {
             "type": "string",
-            "enum": ["photo", "text", "geometry", "fractal", "noise", "mixed", "synthetic", "public-domain", "fixture"]
+            "enum": [
+              "photo",
+              "landscape",
+              "bookpage",
+              "spread",
+              "comic",
+              "scan",
+              "text",
+              "geometry",
+              "fractal",
+              "noise",
+              "mixed",
+              "synthetic",
+              "public-domain",
+              "fixture"
+            ]
           },
-          "codec": { "type": "string" },
-          "width": { "type": "integer", "minimum": 1 },
-          "height": { "type": "integer", "minimum": 1 },
-          "mpix": { "type": "number" },
-          "bands": { "type": "integer" },
-          "jpeg_bytes": { "type": ["integer", "null"] },
-          "license": { "type": "string" },
-          "intent": { "type": "string" },
-          "source_url": { "type": "string" },
-          "notes": { "type": "string" }
+          "codec": {
+            "type": "string"
+          },
+          "aspect": {
+            "type": "string",
+            "enum": [
+              "landscape",
+              "portrait"
+            ]
+          },
+          "width": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "height": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "mpix": {
+            "type": "number"
+          },
+          "bands": {
+            "type": "integer"
+          },
+          "jpeg_bytes": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "license": {
+            "type": "string"
+          },
+          "intent": {
+            "type": "string"
+          },
+          "source_url": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          }
         }
       }
     }

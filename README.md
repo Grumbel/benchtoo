@@ -6,61 +6,42 @@ SPDX-License-Identifier: GPL-3.0-or-later
 # pixel-bench-corpus
 
 Versioned image fixtures for **thumtoo** / **biltoo** pixel benchmarks.
-Kept out of application source trees so generators stay small in git and
-assets are produced via Nix or `generators/gen_synthetic.py`.
+Biltoo is largely an **ebook / comic / album** viewer — the matrix includes
+portrait pages, landscape photos, spreads, and comic panels on purpose.
 
-See thumtoo [`docs/BENCHMARK_KIT.md`](https://github.com/Grumbel/thumtoo/blob/master/docs/BENCHMARK_KIT.md).
+## Content classes
 
-## Design: content classes (not solid fills)
+| Class | Aspect | Content | Stresses |
+|-------|--------|---------|----------|
+| **photo** | landscape | Multi-octave noise + colour washes | Typical camera JPEG |
+| **landscape** | landscape | Sky, sun, horizon, terrain | Wide album photos |
+| **bookpage** | portrait | Cream paper, dense body text, page № | Ebook single pages |
+| **spread** | landscape | Two pages + centre gutter | Open-book spreads |
+| **comic** | portrait | Panel grid, gutters, speech boxes | Manga/comic pages |
+| **scan** | portrait | Bookpage + grain + vignette | Scanned paper |
+| **text** | landscape | Black-on-white UI text | Hard edges / JPEG ringing |
+| **geometry** | landscape | Shapes + checker | Flats + edges |
+| **fractal** | landscape | Mandelbrot | Detail at all scales |
+| **noise** | landscape | Full-entropy noise | Encode/decode upper bound |
+| **mixed** | landscape | Header + text + geometry + photo | Gallery composite |
 
-Solid colour or single-ramp images are useless for JPEG/tile benches: they
-compress to a few KB and barely exercise Huffman/IDCT or tile encode. This
-corpus is a **matrix of content classes**, each aimed at a pipeline question:
+### Size sets
 
-| Class | Content | Stresses |
-|-------|---------|----------|
-| **photo** | Multi-octave value noise + colour washes + grain | Typical camera JPEG path |
-| **text** | Black bitmap glyphs on white, rules | Hard edges, flat runs, JPEG ringing |
-| **geometry** | Circles, rects, diagonals, checker | Flats + edges, tile boundaries |
-| **fractal** | Mandelbrot escape colouring | Detail at every scale (shrink vs full) |
-| **noise** | Full-entropy hash noise | Encode size / decode upper bound |
-| **mixed** | Page layout: gradient + text + geometry + photo panel | Mixed document / gallery content |
+- **Landscape (16:9):** 800×450, 1920×1080, 3840×2160
+- **Portrait (~2:3):** 600×900, 1200×1800, 1600×2400
 
-Default sizes: **800×600** (smoke), **1920×1080** (primary), **3840×2160** (large).
-8K is opt-in (`--with-8k`). Use `--no-large` for a fast smoke set.
-
-All generators are seeded by `(class, width, height)` so output is deterministic
-for a given generator version.
+`--no-large` drops the largest size in each set. `--with-8k` adds 7680×4320
+for landscape classes only.
 
 ## Build
 
 ```bash
 nix build
-# result/synthetic/jpeg/photo_1920x1080_q90.jpg
-# result/manifest.json
-```
-
-```bash
-# local regenerate (needs numpy + Pillow)
 python3 generators/gen_synthetic.py --out ./out
 python3 generators/gen_synthetic.py --out ./out --no-large
-python3 generators/gen_synthetic.py --out ./out --classes photo,text
+python3 generators/gen_synthetic.py --out ./out --classes bookpage,comic,spread,landscape
 ```
-
-## Example JPEG sizes (q90, 1920×1080, this generator)
-
-| Class | Approx. bytes |
-|-------|----------------|
-| photo | ~440 KiB |
-| text | ~210 KiB |
-| geometry | ~160 KiB |
-| fractal | ~310 KiB |
-| noise | ~3.8 MiB |
-| mixed | ~400 KiB |
-
-(Previous solid-blue corpus was ~25 KiB at the same resolution — not useful.)
 
 ## License
 
-GPL-3.0-or-later for generators and this tree. Public-domain pins (when added)
-carry their own SPDX / source URL in `manifest.json`.
+GPL-3.0-or-later for generators and this tree.
