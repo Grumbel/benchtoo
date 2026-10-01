@@ -1,5 +1,5 @@
 {
-  description = "Synthetic and pinned public-domain corpus for thumtoo/biltoo pixel benchmarks";
+  description = "Synthetic content-class corpus for thumtoo/biltoo pixel benchmarks";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
@@ -10,16 +10,17 @@
         inherit system;
         pkgs = import nixpkgs { inherit system; };
       });
+      pyFor = pkgs: pkgs.python3.withPackages (ps: [ ps.numpy ps.pillow ]);
     in {
       packages = forAllSystems ({ pkgs, system }: {
         default = self.packages.${system}.corpus;
         corpus = pkgs.stdenv.mkDerivation {
           pname = "pixel-bench-corpus";
-          version = "0.1.0";
+          version = "0.2.0";
           src = ./.;
-          nativeBuildInputs = [ pkgs.vips pkgs.python3 ];
+          nativeBuildInputs = [ (pyFor pkgs) ];
           buildPhase = ''
-            python3 generators/gen_synthetic.py --out "$PWD/out"
+            ${pyFor pkgs}/bin/python generators/gen_synthetic.py --out "$PWD/out"
           '';
           installPhase = ''
             mkdir -p $out
@@ -30,7 +31,7 @@
             fi
           '';
           meta = with pkgs.lib; {
-            description = "Benchmark image/archive fixtures for thumtoo pixel paths";
+            description = "Benchmark image fixtures (content-class matrix) for thumtoo pixel paths";
             license = licenses.gpl3Plus;
             platforms = platforms.unix;
           };
@@ -43,9 +44,10 @@
           program = "${pkgs.writeShellScript "pixel-bench-generate" ''
             set -euo pipefail
             out="''${1:-./out}"
-            exec ${pkgs.python3}/bin/python3 ${./generators/gen_synthetic.py} --out "$out"
+            shift || true
+            exec ${pyFor pkgs}/bin/python ${./generators/gen_synthetic.py} --out "$out" "$@"
           ''}";
-          meta.description = "Regenerate synthetic corpus into a directory";
+          meta.description = "Regenerate synthetic corpus (content classes) into a directory";
         };
       });
     };

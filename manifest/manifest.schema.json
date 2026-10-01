@@ -5,8 +5,9 @@
   "type": "object",
   "required": ["schema", "entries"],
   "properties": {
-    "schema": { "type": "integer", "const": 1 },
+    "schema": { "type": "integer", "minimum": 1 },
     "generator": { "type": "string" },
+    "generator_note": { "type": "string" },
     "entries": {
       "type": "array",
       "items": {
@@ -17,13 +18,16 @@
           "path": { "type": "string" },
           "class": {
             "type": "string",
-            "enum": ["synthetic", "public-domain", "fixture"]
+            "enum": ["photo", "text", "geometry", "fractal", "noise", "mixed", "synthetic", "public-domain", "fixture"]
           },
           "codec": { "type": "string" },
           "width": { "type": "integer", "minimum": 1 },
           "height": { "type": "integer", "minimum": 1 },
           "mpix": { "type": "number" },
+          "bands": { "type": "integer" },
+          "jpeg_bytes": { "type": ["integer", "null"] },
           "license": { "type": "string" },
+          "intent": { "type": "string" },
           "source_url": { "type": "string" },
           "notes": { "type": "string" }
         }

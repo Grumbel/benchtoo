@@ -5,48 +5,60 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
 # pixel-bench-corpus
 
-Versioned image and archive fixtures for **thumtoo** / **biltoo** pixel
-benchmarks. Kept out of the application source trees so binary samples stay
-small in git and large assets are produced or pinned via Nix.
+Versioned image fixtures for **thumtoo** / **biltoo** pixel benchmarks.
+Kept out of application source trees so generators stay small in git and
+assets are produced via Nix or `generators/gen_synthetic.py`.
 
 See thumtoo [`docs/BENCHMARK_KIT.md`](https://github.com/Grumbel/thumtoo/blob/master/docs/BENCHMARK_KIT.md).
+
+## Design: content classes (not solid fills)
+
+Solid colour or single-ramp images are useless for JPEG/tile benches: they
+compress to a few KB and barely exercise Huffman/IDCT or tile encode. This
+corpus is a **matrix of content classes**, each aimed at a pipeline question:
+
+| Class | Content | Stresses |
+|-------|---------|----------|
+| **photo** | Multi-octave value noise + colour washes + grain | Typical camera JPEG path |
+| **text** | Black bitmap glyphs on white, rules | Hard edges, flat runs, JPEG ringing |
+| **geometry** | Circles, rects, diagonals, checker | Flats + edges, tile boundaries |
+| **fractal** | Mandelbrot escape colouring | Detail at every scale (shrink vs full) |
+| **noise** | Full-entropy hash noise | Encode size / decode upper bound |
+| **mixed** | Page layout: gradient + text + geometry + photo panel | Mixed document / gallery content |
+
+Default sizes: **800×600** (smoke), **1920×1080** (primary), **3840×2160** (large).
+8K is opt-in (`--with-8k`). Use `--no-large` for a fast smoke set.
+
+All generators are seeded by `(class, width, height)` so output is deterministic
+for a given generator version.
 
 ## Build
 
 ```bash
 nix build
-# result/synthetic/jpeg/synth_1920x1080_q90.jpg
+# result/synthetic/jpeg/photo_1920x1080_q90.jpg
 # result/manifest.json
 ```
 
-Regenerate into a directory without a full store build:
-
 ```bash
-nix run .#generate -- ./out
+# local regenerate (needs numpy + Pillow)
+python3 generators/gen_synthetic.py --out ./out
+python3 generators/gen_synthetic.py --out ./out --no-large
+python3 generators/gen_synthetic.py --out ./out --classes photo,text
 ```
 
-## Contents (v0.1)
+## Example JPEG sizes (q90, 1920×1080, this generator)
 
-| Path pattern | Purpose |
-|--------------|---------|
-| `synthetic/jpeg/synth_{W}x{H}_q90.jpg` | JPEG decode / shrink / tile encode scaling |
-| `synthetic/png/synth_{W}x{H}.png` | Lossless reference for the same sizes |
-| `manifest.json` | Machine-readable inventory |
+| Class | Approx. bytes |
+|-------|----------------|
+| photo | ~440 KiB |
+| text | ~210 KiB |
+| geometry | ~160 KiB |
+| fractal | ~310 KiB |
+| noise | ~3.8 MiB |
+| mixed | ~400 KiB |
 
-Sizes: 800×600, 1920×1080, 3840×2160, 7680×4320 (3-band RGB uchar).
-
-## Consume from thumtoo
-
-```nix
-# flake input
-pixel-bench-corpus.url = "git+file:///path/to/pixel-bench-corpus";
-# or github once published
-```
-
-```bash
-export THUMTOO_BENCH_CORPUS=$(nix build --no-link --print-out-paths .#corpus)
-thumtoo-microbench-decode "$THUMTOO_BENCH_CORPUS"/synthetic/jpeg/*.jpg
-```
+(Previous solid-blue corpus was ~25 KiB at the same resolution — not useful.)
 
 ## License
 
