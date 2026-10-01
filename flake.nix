@@ -28,7 +28,8 @@
             pname = "benchtoo";
             version = "0.2.1";
             src = ./.;
-            nativeBuildInputs = [ py pkgs.poppler_utils ];
+            nativeBuildInputs = [ py pkgs.poppler_utils ]
+            ++ pkgs.lib.optional (pkgs ? pdf2djvu) pkgs.pdf2djvu;
             dontConfigure = true;
             buildPhase = ''
               runHook preBuild
@@ -37,7 +38,7 @@
               ${py}/bin/python3 -c "import numpy, PIL; print('numpy', numpy.__version__, 'PIL', PIL.__version__)"
               ${py}/bin/python3 generators/gen_synthetic.py --out "$PWD/out"
               ${py}/bin/python3 generators/gen_archives.py --corpus "$PWD/out"
-              ${py}/bin/python3 generators/gen_documents.py --out "$PWD/out" --pages 40 --skip-djvu
+              ${py}/bin/python3 generators/gen_documents.py --out "$PWD/out" --pages 40
               runHook postBuild
             '';
             installPhase = ''

@@ -7,15 +7,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
 ## Status (2026-10-01)
 
-**Tip:** benchtoo-008.1-rename (renamed from pixel-bench-corpus).
+**Tip:** benchtoo-008.3-djvu-optional
 
-### 008.1
-- Project rename: **benchtoo** (was pixel-bench-corpus)
-- Banner text, flake pname, schema $id, README, generators updated
+### Recent
+- Optional pdf2djvu in flake when package exists
+- Repo: https://github.com/Grumbel/benchtoo
 
-### Prior
-- 007 book CBZ; 006 documents/labels; 005 archives; 004 ebook classes
-
-### Bundle policy
-Full-history tip bundles (`--all`). Name: `benchtoo-NNN.M-slug-da43bb7.bundle`
-(base short of root commit stays fixed for the stack).
+### Next
+- Real RAR4 fixture for unarr A/B (optional third-party or generated)
+- Larger multi-chapter book page counts for CI vs local
