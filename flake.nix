@@ -14,6 +14,7 @@
         pkgs.python3.withPackages (ps: [
           ps.numpy
           ps.pillow
+          ps.reportlab
         ]);
     in {
       packages = forAllSystems ({ pkgs, system }:
@@ -36,6 +37,7 @@
               ${py}/bin/python3 -c "import numpy, PIL; print('numpy', numpy.__version__, 'PIL', PIL.__version__)"
               ${py}/bin/python3 generators/gen_synthetic.py --out "$PWD/out"
               ${py}/bin/python3 generators/gen_archives.py --corpus "$PWD/out"
+              ${py}/bin/python3 generators/gen_documents.py --out "$PWD/out" --pages 40 --skip-djvu
               runHook postBuild
             '';
             installPhase = ''

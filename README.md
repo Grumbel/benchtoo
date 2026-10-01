@@ -33,6 +33,18 @@ portrait pages, landscape photos, spreads, and comic panels on purpose.
 `--no-large` drops the largest size in each set. `--with-8k` adds 7680×4320
 for landscape classes only.
 
+## Documents (PDF, text, Markdown)
+
+```bash
+python3 generators/gen_documents.py --out ./out --pages 40
+# documents/sample_book.pdf   — multi-page A4 book (chapters, figures, footers)
+# documents/sample_article.md
+# documents/sample_notes.txt
+# documents/sample_book.djvu  — only if pdf2djvu is available
+```
+
+Raster fixtures also carry a **bottom banner** with class, resolution, and purpose.
+
 ## Archives
 
 After synthetics exist:

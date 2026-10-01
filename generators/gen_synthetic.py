@@ -31,7 +31,9 @@ portrait   ~2:3 — 600×900, 1200×1800, 1600×2400
 Each class picks the set that matches real files of that kind. ``--no-large``
 drops the largest size in each set; ``--with-8k`` adds 7680×4320 landscape only.
 
-Seeds are ``(class, width, height)`` so output is stable for a generator version.
+Every image gets a bottom banner with class, resolution, and purpose so fixtures
+are self-explanatory in a viewer. Seeds are ``(class, width, height)`` so output
+is stable for a generator version.
 
 Requires: numpy, Pillow.
 """
@@ -722,6 +724,36 @@ CLASSES: dict[str, dict] = {
 }
 
 
+def _label_banner(img: np.ndarray, class_name: str, intent: str) -> np.ndarray:
+    """Burn class, resolution, and purpose into the image so fixtures are self-explanatory."""
+    h, w = img.shape[:2]
+    out = img.copy()
+    banner_h = max(28, min(h // 18, 56))
+    # Dark bar at bottom
+    y0 = h - banner_h
+    out[y0:h, :, :] = (20, 20, 24)
+    # Thin accent line
+    out[max(0, y0 - 2) : y0, :, :] = (80, 140, 220)
+    scale = max(1, min(3, banner_h // 14))
+    lines = [
+        f"{class_name.upper()}  {w}X{h}  PIXEL-BENCH-CORPUS",
+        intent.upper()[: max(20, w // (5 * scale + 1))],
+    ]
+    _blit_text(
+        out,
+        lines,
+        x0=max(4, w // 80),
+        y0=y0 + max(2, banner_h // 10),
+        x1=w - 4,
+        y1=h - 2,
+        color=(230, 230, 235),
+        scale=scale,
+        line_gap=max(1, scale),
+    )
+    return out
+
+
+
 def save_png(rgb: np.ndarray, path: Path) -> None:
     Image.fromarray(np.ascontiguousarray(rgb), mode="RGB").save(
         path, format="PNG", optimize=False
@@ -789,6 +821,7 @@ def main() -> int:
             rgb = meta["fn"](w, h)
             if rgb.shape != (h, w, 3):
                 raise RuntimeError(f"{cls} produced {rgb.shape}, expected {(h, w, 3)}")
+            rgb = _label_banner(rgb, cls, meta["intent"])
             stem = f"{cls}_{w}x{h}"
             png_path = png_dir / f"{stem}.png"
             jpg_path = jpeg_dir / f"{stem}_q{JPEG_Q}.jpg"
