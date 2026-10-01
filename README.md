@@ -68,6 +68,19 @@ python3 generators/gen_archives.py --corpus ./out
 
 ZIP **stored** (no deflate) so extract timing is not dominated by zlib.
 
+## Packages
+
+| Attr | Contents |
+|------|----------|
+| `corpus` (default) | Full class matrix + large sizes + 40-page PDF |
+| `corpus-smoke` | `--no-large` photo/bookpage/comic + 8-page PDF (CI / flake check) |
+
+```bash
+nix build .#corpus-smoke
+```
+
+Optional RAR4 (when `rar` is installed): `python3 generators/gen_rar.py --corpus ./out`
+
 ## Build
 
 ```bash

@@ -7,12 +7,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
 ## Status (2026-10-01)
 
-**Tip:** benchtoo-008.3-djvu-optional
+**Tip:** benchtoo-009.1-corpus-smoke
 
-### Recent
-- Optional pdf2djvu in flake when package exists
-- Repo: https://github.com/Grumbel/benchtoo
+### 009.1
+- `packages.corpus-smoke` — photo/bookpage/comic, `--no-large`, 8-page PDF
+- `packages.corpus` — full matrix
+- `generators/gen_rar.py` — optional RAR4 when `rar` on PATH
 
-### Next
-- Real RAR4 fixture for unarr A/B (optional third-party or generated)
-- Larger multi-chapter book page counts for CI vs local
+### Repo
+https://github.com/Grumbel/benchtoo
