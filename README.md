@@ -3,7 +3,7 @@ SPDX-FileCopyrightText: 2026 Ingo Ruhnke <grumbel@gmail.com>
 SPDX-License-Identifier: GPL-3.0-or-later
 -->
 
-# pixel-bench-corpus
+# benchtoo
 
 Versioned image fixtures for **thumtoo** / **biltoo** pixel benchmarks.
 Biltoo is largely an **ebook / comic / album** viewer — the matrix includes

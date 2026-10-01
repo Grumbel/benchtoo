@@ -92,7 +92,7 @@ def _body_paragraphs(chapter_idx: int, page_in_chapter: int) -> list[str]:
 def _draw_header(c: canvas.Canvas, title: str, page_no: int, total: int) -> None:
     c.setFont("Times-Roman", 9)
     c.setFillColor(Color(0.35, 0.35, 0.4))
-    c.drawString(20 * mm, PAGE_H - 12 * mm, "pixel-bench-corpus — sample book")
+    c.drawString(20 * mm, PAGE_H - 12 * mm, "benchtoo — sample book")
     c.drawRightString(PAGE_W - 20 * mm, PAGE_H - 12 * mm, title[:48])
     c.setStrokeColor(Color(0.7, 0.7, 0.75))
     c.setLineWidth(0.4)
@@ -146,8 +146,8 @@ def write_sample_book_pdf(path: Path, num_pages: int) -> dict:
     chapters = _chapter_titles()
     pages_per_chapter = max(2, num_pages // len(chapters))
     c = canvas.Canvas(str(path), pagesize=A4)
-    c.setTitle("pixel-bench-corpus sample book")
-    c.setAuthor("pixel-bench-corpus")
+    c.setTitle("benchtoo sample book")
+    c.setAuthor("benchtoo")
     c.setSubject("Synthetic multi-page PDF for thumtoo/biltoo benches")
 
     page_no = 0
@@ -156,7 +156,7 @@ def write_sample_book_pdf(path: Path, num_pages: int) -> dict:
     c.setFont("Times-Bold", 22)
     c.drawCentredString(PAGE_W / 2, PAGE_H / 2 + 40, "Sample Book")
     c.setFont("Times-Roman", 12)
-    c.drawCentredString(PAGE_W / 2, PAGE_H / 2 + 10, "pixel-bench-corpus")
+    c.drawCentredString(PAGE_W / 2, PAGE_H / 2 + 10, "benchtoo")
     c.setFont("Courier", 9)
     c.drawCentredString(
         PAGE_W / 2,
@@ -250,7 +250,7 @@ def write_sample_book_pdf(path: Path, num_pages: int) -> dict:
 
 def write_markdown(path: Path) -> None:
     path.write_text(
-        """# pixel-bench-corpus — sample Markdown
+        """# benchtoo — sample Markdown
 
 **Purpose:** exercise thumtoo / biltoo Markdown document paths (not only rasters).
 
@@ -287,7 +287,7 @@ class: markdown
 
 def write_plaintext(path: Path) -> None:
     path.write_text(
-        """pixel-bench-corpus sample plain text
+        """benchtoo sample plain text
 ====================================
 
 Purpose: thumtoo text-file path (no raster decode).

@@ -511,7 +511,7 @@ def render_text(w: int, h: int) -> np.ndarray:
     img = np.full((h, w, 3), 255, dtype=np.uint8)
     margin = max(16, min(w, h) // 20)
     lines = [
-        "PIXEL BENCH CORPUS — TEXT CLASS",
+        "BENCHTOO — TEXT CLASS",
         "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG 0123456789",
         "HARD EDGES AND FLAT RUNS STRESS JPEG RINGING AND HUFFMAN",
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
@@ -736,7 +736,7 @@ def _label_banner(img: np.ndarray, class_name: str, intent: str) -> np.ndarray:
     out[max(0, y0 - 2) : y0, :, :] = (80, 140, 220)
     scale = max(1, min(3, banner_h // 14))
     lines = [
-        f"{class_name.upper()}  {w}X{h}  PIXEL-BENCH-CORPUS",
+        f"{class_name.upper()}  {w}X{h}  BENCHTOO",
         intent.upper()[: max(20, w // (5 * scale + 1))],
     ]
     _blit_text(

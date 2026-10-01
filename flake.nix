@@ -1,5 +1,5 @@
 {
-  description = "Synthetic content-class corpus for thumtoo/biltoo pixel benchmarks";
+  description = "benchtoo — synthetic content-class corpus for thumtoo/biltoo benches";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
@@ -25,7 +25,7 @@
         in {
           default = self.packages.${system}.corpus;
           corpus = pkgs.stdenvNoCC.mkDerivation {
-            pname = "pixel-bench-corpus";
+            pname = "benchtoo";
             version = "0.2.1";
             src = ./.;
             nativeBuildInputs = [ py pkgs.poppler_utils ];
@@ -61,7 +61,7 @@
         in {
           generate = {
             type = "app";
-            program = "${pkgs.writeShellScript "pixel-bench-generate" ''
+            program = "${pkgs.writeShellScript "benchtoo-generate" ''
               set -euo pipefail
               out="''${1:-./out}"
               shift || true

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/Grumbel/pixel-bench-corpus/manifest.schema.json",
-  "title": "pixel-bench-corpus manifest",
+  "$id": "https://github.com/Grumbel/benchtoo/manifest.schema.json",
+  "title": "benchtoo manifest",
   "type": "object",
   "required": [
     "schema",
