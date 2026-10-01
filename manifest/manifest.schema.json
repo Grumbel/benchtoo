@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Grumbel/pixel-bench-corpus/manifest.schema.json",
+  "title": "pixel-bench-corpus manifest",
+  "type": "object",
+  "required": ["schema", "entries"],
+  "properties": {
+    "schema": { "type": "integer", "const": 1 },
+    "generator": { "type": "string" },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "path", "class", "width", "height"],
+        "properties": {
+          "id": { "type": "string" },
+          "path": { "type": "string" },
+          "class": {
+            "type": "string",
+            "enum": ["synthetic", "public-domain", "fixture"]
+          },
+          "codec": { "type": "string" },
+          "width": { "type": "integer", "minimum": 1 },
+          "height": { "type": "integer", "minimum": 1 },
+          "mpix": { "type": "number" },
+          "license": { "type": "string" },
+          "source_url": { "type": "string" },
+          "notes": { "type": "string" }
+        }
+      }
+    }
+  }
+}
