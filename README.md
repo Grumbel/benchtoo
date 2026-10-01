@@ -33,7 +33,7 @@ nix run .#generate -- ./out
 | `synthetic/png/synth_{W}x{H}.png` | Lossless reference for the same sizes |
 | `manifest.json` | Machine-readable inventory |
 
-Sizes: 800×600, 1920×1080, 3840×2160, 7680×4320.
+Sizes: 800×600, 1920×1080, 3840×2160, 7680×4320 (3-band RGB uchar).
 
 ## Consume from thumtoo
 
