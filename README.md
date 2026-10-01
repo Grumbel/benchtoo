@@ -40,6 +40,7 @@ python3 generators/gen_documents.py --out ./out --pages 40
 # documents/sample_book.pdf   — multi-page A4 book (chapters, figures, footers)
 # documents/sample_article.md
 # documents/sample_notes.txt
+# documents/sample_book.cbz   — rasterized pages (needs pdftoppm)
 # documents/sample_book.djvu  — only if pdf2djvu is available
 ```
 

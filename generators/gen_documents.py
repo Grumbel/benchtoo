@@ -331,6 +331,40 @@ def try_write_djvu_from_pdf(pdf: Path, djvu: Path) -> bool:
     return False
 
 
+def write_book_cbz_from_pdf(pdf: Path, cbz: Path, max_pages: int = 0) -> int:
+    """Rasterize PDF pages with pdftoppm into a stored CBZ. Returns page count."""
+    import tempfile
+    import shutil
+
+    if not pdf.is_file():
+        return 0
+    pdftoppm = shutil.which("pdftoppm")
+    if not pdftoppm:
+        print("skip book CBZ (pdftoppm not found)")
+        return 0
+    with tempfile.TemporaryDirectory(prefix="pbc-pdf-") as tmp:
+        tmp_path = Path(tmp)
+        prefix = tmp_path / "page"
+        cmd = [pdftoppm, "-jpeg", "-r", "120", str(pdf), str(prefix)]
+        if max_pages > 0:
+            cmd = [pdftoppm, "-jpeg", "-r", "120", "-f", "1", "-l", str(max_pages), str(pdf), str(prefix)]
+        try:
+            subprocess.run(cmd, check=True, capture_output=True, timeout=300)
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:
+            print(f"skip book CBZ (pdftoppm failed: {e})")
+            return 0
+        pages = sorted(tmp_path.glob("page*.jpg"))
+        if not pages:
+            print("skip book CBZ (no page images)")
+            return 0
+        cbz.parent.mkdir(parents=True, exist_ok=True)
+        with zipfile.ZipFile(cbz, "w", compression=zipfile.ZIP_STORED) as zf:
+            for i, page in enumerate(pages):
+                zf.write(page, arcname=f"pages/{i + 1:03d}.jpg")
+        return len(pages)
+
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--out", type=Path, required=True, help="corpus root")
@@ -358,6 +392,23 @@ def main() -> int:
         }
     )
     print(f"wrote {pdf_path} pages={max(8, args.pages)}")
+
+    cbz_path = doc / "sample_book.cbz"
+    n_cbz = write_book_cbz_from_pdf(pdf_path, cbz_path)
+    if n_cbz:
+        entries.append(
+            {
+                "id": "sample_book_cbz",
+                "path": str(cbz_path.relative_to(root)),
+                "class": "cbz-book",
+                "codec": "zip-stored",
+                "pages": n_cbz,
+                "aspect": "portrait",
+                "intent": "CBZ of rasterized sample_book.pdf pages (pdftoppm)",
+                "license": "GPL-3.0-or-later",
+            }
+        )
+        print(f"wrote {cbz_path} pages={n_cbz}")
 
     md_path = doc / "sample_article.md"
     write_markdown(md_path)

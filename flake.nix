@@ -28,7 +28,7 @@
             pname = "pixel-bench-corpus";
             version = "0.2.1";
             src = ./.;
-            nativeBuildInputs = [ py ];
+            nativeBuildInputs = [ py pkgs.poppler_utils ];
             dontConfigure = true;
             buildPhase = ''
               runHook preBuild
