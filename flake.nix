@@ -10,45 +10,60 @@
         inherit system;
         pkgs = import nixpkgs { inherit system; };
       });
-      pyFor = pkgs: pkgs.python3.withPackages (ps: [ ps.numpy ps.pillow ]);
+      # Single env per pkgs — use this interpreter everywhere (PATH python3 is not enough).
+      pythonEnv = pkgs:
+        pkgs.python3.withPackages (ps: [
+          ps.numpy
+          ps.pillow
+        ]);
     in {
-      packages = forAllSystems ({ pkgs, system }: {
-        default = self.packages.${system}.corpus;
-        corpus = pkgs.stdenv.mkDerivation {
-          pname = "pixel-bench-corpus";
-          version = "0.2.0";
-          src = ./.;
-          nativeBuildInputs = [ (pyFor pkgs) ];
-          buildPhase = ''
-            ${pyFor pkgs}/bin/python generators/gen_synthetic.py --out "$PWD/out"
-          '';
-          installPhase = ''
-            mkdir -p $out
-            cp -a out/. $out/
-            cp manifest/manifest.schema.json $out/manifest.schema.json
-            if [ -f out/manifest.json ]; then
-              cp out/manifest.json $out/manifest.json
-            fi
-          '';
-          meta = with pkgs.lib; {
-            description = "Benchmark image fixtures (content-class matrix) for thumtoo pixel paths";
-            license = licenses.gpl3Plus;
-            platforms = platforms.unix;
+      packages = forAllSystems ({ pkgs, system }:
+        let
+          py = pythonEnv pkgs;
+        in {
+          default = self.packages.${system}.corpus;
+          corpus = pkgs.stdenvNoCC.mkDerivation {
+            pname = "pixel-bench-corpus";
+            version = "0.2.1";
+            src = ./.;
+            nativeBuildInputs = [ py ];
+            dontConfigure = true;
+            # Do not call bare `python3` — it may resolve to an unwrapped interpreter
+            # without site-packages. Always use the withPackages wrapper.
+            buildPhase = ''
+              runHook preBuild
+              ${py}/bin/python3 generators/gen_synthetic.py --out "$PWD/out"
+              runHook postBuild
+            '';
+            installPhase = ''
+              runHook preInstall
+              mkdir -p $out
+              cp -a out/. $out/
+              cp manifest/manifest.schema.json $out/manifest.schema.json
+              runHook postInstall
+            '';
+            meta = with pkgs.lib; {
+              description = "Benchmark image fixtures (content-class matrix) for thumtoo pixel paths";
+              license = licenses.gpl3Plus;
+              platforms = platforms.unix;
+            };
           };
-        };
-      });
+        });
 
-      apps = forAllSystems ({ pkgs, system }: {
-        generate = {
-          type = "app";
-          program = "${pkgs.writeShellScript "pixel-bench-generate" ''
-            set -euo pipefail
-            out="''${1:-./out}"
-            shift || true
-            exec ${pyFor pkgs}/bin/python ${./generators/gen_synthetic.py} --out "$out" "$@"
-          ''}";
-          meta.description = "Regenerate synthetic corpus (content classes) into a directory";
-        };
-      });
+      apps = forAllSystems ({ pkgs, system }:
+        let
+          py = pythonEnv pkgs;
+        in {
+          generate = {
+            type = "app";
+            program = "${pkgs.writeShellScript "pixel-bench-generate" ''
+              set -euo pipefail
+              out="''${1:-./out}"
+              shift || true
+              exec ${py}/bin/python3 ${./generators/gen_synthetic.py} --out "$out" "$@"
+            ''}";
+            meta.description = "Regenerate synthetic corpus (content classes) into a directory";
+          };
+        });
     };
 }
