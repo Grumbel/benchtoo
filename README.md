@@ -62,8 +62,9 @@ Raster fixtures also carry a **bottom banner** with class, resolution, and purpo
 ```bash
 python3 generators/gen_pdf_classes.py --out ./out          # full resolution
 python3 generators/gen_pdf_classes.py --out ./out --small  # quarter dpi (CI)
-python3 generators/check_pdf_classes.py --corpus ./out \
-    --tool /path/to/thumtoo-pdf-profile --render --threads 4
+(cd generators && python3 gen_djvu_classes.py --out ../out)   # needs djvulibre
+python3 generators/check_page_classes.py --corpus ./out \
+    --tool /path/to/thumtoo-page-profile --render --threads 4
 ```
 
 One PDF per page-content class thumtoo distinguishes (`PdfPageProfile`):
@@ -72,9 +73,14 @@ bitonal scans at 300–600 dpi, a searchable scan (invisible OCR text), a scan
 with a white background fill, an MRC-style 150 + 600 dpi scan, a scan with a
 Bates stamp, ClearScan-style (image + visible glyphs), a magazine page and a
 rotated scan. `out/pdf_classes.json` holds the expected kind, native dpi,
-resolution cap and flags; `check_pdf_classes.py` compares thumtoo's verdict
+resolution cap and flags; `check_page_classes.py` compares thumtoo's verdict
 and, with `--render`, checks that each image decodes once per page and zoom
 level.
+
+DjVu: `gen_djvu_classes.py` writes bitonal (300/600 dpi), photo (150 dpi),
+compound (300 dpi JB2 + 100 dpi IW44), searchable (hidden text) and blank
+pages, plus a bundled 6-page book, with `out/djvu_classes.json`
+(layers, dpi, text layer). The checker reads both manifests.
 
 ## Archives
 

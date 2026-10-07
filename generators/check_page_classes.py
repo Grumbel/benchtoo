@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
 # SPDX-FileCopyrightText: 2026 Ingo Ruhnke <grumbel@gmail.com>
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Check thumtoo's PDF page classification against gen_pdf_classes.py.
+"""Check thumtoo's page classification against the class generators.
 
-Runs ``thumtoo-pdf-profile --json`` on every case in ``pdf_classes.json`` and
+Reads ``pdf_classes.json`` (gen_pdf_classes.py) and ``djvu_classes.json``
+(gen_djvu_classes.py), whichever exist, runs ``thumtoo-page-profile --json``
+on every case and
 compares kind, native dpi, resolution cap, background-fill and OCR-layer
 detection. With ``--render`` it also renders every cell at the page's cap
 (or layout scale) and reports cells, time and exact image decode counts —
 each image should decode once per page and zoom level, not once per cell.
 
 Usage:
-  python3 generators/check_pdf_classes.py --corpus ./out \\
-      --tool /tmp/thumtoo-build/thumtoo-pdf-profile [--render] [--threads 4]
+  python3 generators/check_page_classes.py --corpus ./out \\
+      --tool /tmp/thumtoo-build/thumtoo-page-profile [--render] [--threads 4]
 
 Exit status 1 when any case disagrees.
 """
@@ -48,6 +50,8 @@ def compare(expect: dict, got: dict) -> list[str]:
     if got["finest_useful_scale"] != expect["finest_useful_scale"]:
         problems.append(f"finest_useful_scale {got['finest_useful_scale']} != "
                         f"{expect['finest_useful_scale']}")
+    if "layers" in expect and len(got["images"]) != expect["layers"]:
+        problems.append(f"{len(got['images'])} layers != {expect['layers']}")
     if got["background_fill_ignored"] != expect["background_fill_ignored"]:
         problems.append(f"background_fill_ignored {got['background_fill_ignored']}")
     if (got["invisible_glyphs"] > 0) != expect["invisible_text"]:
@@ -66,20 +70,27 @@ def compare(expect: dict, got: dict) -> list[str]:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--corpus", type=Path, required=True)
-    ap.add_argument("--tool", default="thumtoo-pdf-profile")
+    ap.add_argument("--tool", default="thumtoo-page-profile")
     ap.add_argument("--render", action="store_true")
     ap.add_argument("--threads", type=int, default=1)
     args = ap.parse_args()
 
-    manifest = json.loads((args.corpus / "pdf_classes.json").read_text())
+    entries = []
+    for name in ("pdf_classes.json", "djvu_classes.json"):
+        path = args.corpus / name
+        if path.exists():
+            entries += json.loads(path.read_text())["entries"]
+    if not entries:
+        raise SystemExit(f"no *_classes.json in {args.corpus}")
     failures = 0
-    for entry in manifest["entries"]:
+    for entry in entries:
         got = profile(args.tool, args.corpus / entry["file"], entry["page"],
                       args.render, args.threads)
         problems = compare(entry["expect"], got)
         status = "FAIL" if problems else "ok"
         failures += bool(problems)
-        print(f"{status:4} {Path(entry['file']).stem:28} {got.get('summary', '')}")
+        label = f"{Path(entry['file']).stem}:{entry['page']}"
+        print(f"{status:4} {label:30} {got.get('summary', '')}")
         render = got.get("render")
         if render:
             print(f"     render s={render['scale']}: {render['cells']} cells "
@@ -89,7 +100,7 @@ def main() -> int:
                   f"subarea {render.get('subarea_decodes', '?')})")
         for p in problems:
             print(f"     - {p}")
-    print(f"{len(manifest['entries']) - failures}/{len(manifest['entries'])} cases agree")
+    print(f"{len(entries) - failures}/{len(entries)} cases agree")
     return 1 if failures else 0
 
 

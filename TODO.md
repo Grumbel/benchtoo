@@ -9,11 +9,17 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
 **Tip:** PDF page classes (Claude Code, direct commit)
 
+### DjVu page classes
+- `generators/gen_djvu_classes.py` (djvulibre tools; in devShell and corpus
+  builds): bitonal 300/600, photo 150, compound, OCR text layer, blank,
+  bundled book; `out/djvu_classes.json`.
+- `check_pdf_classes.py` → `check_page_classes.py` (PDF + DjVu manifests,
+  layer counts); tool `thumtoo-page-profile` (thumtoo ≥ 91995ad).
+
 ### PDF page classes
 - `generators/gen_pdf_classes.py` — 14 PDFs, one per thumtoo page-content
   class, with `out/pdf_classes.json` expectations (kind, native dpi, cap).
-- `generators/check_pdf_classes.py` — runs `thumtoo-pdf-profile --json`
-  (thumtoo ≥ f917301) and compares; `--render` checks decode-once.
+- checker: see DjVu section (`check_page_classes.py`).
 - `devShells.default` with the Python environment (`nix develop`).
 - Both corpus packages include the classes (`--small` for smoke).
 

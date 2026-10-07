@@ -21,7 +21,7 @@
         pkgs.stdenvNoCC.mkDerivation {
           inherit pname version;
           src = ./.;
-          nativeBuildInputs = [ py pkgs."poppler-utils" ];
+          nativeBuildInputs = [ py pkgs."poppler-utils" pkgs.djvulibre ];
           dontConfigure = true;
           buildPhase = ''
             runHook preBuild
@@ -62,6 +62,7 @@
               ${py}/bin/python3 generators/gen_archives.py --corpus "$PWD/out"
               ${py}/bin/python3 generators/gen_documents.py --out "$PWD/out" --pages 40 --skip-djvu
               ${py}/bin/python3 generators/gen_pdf_classes.py --out "$PWD/out"
+              (cd generators && ${py}/bin/python3 gen_djvu_classes.py --out "$PWD/../out")
               if command -v rar >/dev/null 2>&1; then
                 ${py}/bin/python3 generators/gen_rar.py --corpus "$PWD/out" || true
               fi
@@ -79,13 +80,14 @@
               ${py}/bin/python3 generators/gen_archives.py --corpus "$PWD/out"
               ${py}/bin/python3 generators/gen_documents.py --out "$PWD/out" --pages 8 --skip-djvu
               ${py}/bin/python3 generators/gen_pdf_classes.py --out "$PWD/out" --small
+              (cd generators && ${py}/bin/python3 gen_djvu_classes.py --out "$PWD/../out" --small)
             '';
           };
         });
 
       devShells = forAllSystems ({ pkgs, system }: {
         default = pkgs.mkShell {
-          packages = [ (pythonEnv pkgs) pkgs."poppler-utils" ];
+          packages = [ (pythonEnv pkgs) pkgs."poppler-utils" pkgs.djvulibre ];
         };
       });
 
