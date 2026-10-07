@@ -3,3 +3,4 @@
 /result-*
 *.swp
 .direnv/
+__pycache__/
