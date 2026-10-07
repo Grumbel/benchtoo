@@ -57,6 +57,25 @@ python3 generators/gen_documents.py --out ./out --pages 40
 
 Raster fixtures also carry a **bottom banner** with class, resolution, and purpose.
 
+## PDF page classes
+
+```bash
+python3 generators/gen_pdf_classes.py --out ./out          # full resolution
+python3 generators/gen_pdf_classes.py --out ./out --small  # quarter dpi (CI)
+python3 generators/check_pdf_classes.py --corpus ./out \
+    --tool /path/to/thumtoo-pdf-profile --render --threads 4
+```
+
+One PDF per page-content class thumtoo distinguishes (`PdfPageProfile`):
+empty, vector text, vector diagram, large vector map (A2), greyscale / colour /
+bitonal scans at 300–600 dpi, a searchable scan (invisible OCR text), a scan
+with a white background fill, an MRC-style 150 + 600 dpi scan, a scan with a
+Bates stamp, ClearScan-style (image + visible glyphs), a magazine page and a
+rotated scan. `out/pdf_classes.json` holds the expected kind, native dpi,
+resolution cap and flags; `check_pdf_classes.py` compares thumtoo's verdict
+and, with `--render`, checks that each image decodes once per page and zoom
+level.
+
 ## Archives
 
 After synthetics exist:
@@ -72,8 +91,8 @@ ZIP **stored** (no deflate) so extract timing is not dominated by zlib.
 
 | Attr | Contents |
 |------|----------|
-| `corpus` (default) | Full class matrix + large sizes + 40-page PDF |
-| `corpus-smoke` | `--no-large` photo/bookpage/comic + 8-page PDF (CI / flake check) |
+| `corpus` (default) | Full class matrix + large sizes + 40-page PDF + PDF page classes |
+| `corpus-smoke` | `--no-large` photo/bookpage/comic + 8-page PDF + `--small` PDF classes (CI / flake check) |
 
 ```bash
 nix build .#corpus-smoke

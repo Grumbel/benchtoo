@@ -61,6 +61,7 @@
               ${py}/bin/python3 generators/gen_synthetic.py --out "$PWD/out"
               ${py}/bin/python3 generators/gen_archives.py --corpus "$PWD/out"
               ${py}/bin/python3 generators/gen_documents.py --out "$PWD/out" --pages 40 --skip-djvu
+              ${py}/bin/python3 generators/gen_pdf_classes.py --out "$PWD/out"
               if command -v rar >/dev/null 2>&1; then
                 ${py}/bin/python3 generators/gen_rar.py --corpus "$PWD/out" || true
               fi
@@ -77,9 +78,16 @@
                 --classes photo,bookpage,comic
               ${py}/bin/python3 generators/gen_archives.py --corpus "$PWD/out"
               ${py}/bin/python3 generators/gen_documents.py --out "$PWD/out" --pages 8 --skip-djvu
+              ${py}/bin/python3 generators/gen_pdf_classes.py --out "$PWD/out" --small
             '';
           };
         });
+
+      devShells = forAllSystems ({ pkgs, system }: {
+        default = pkgs.mkShell {
+          packages = [ (pythonEnv pkgs) pkgs."poppler-utils" ];
+        };
+      });
 
       apps = forAllSystems ({ pkgs, system }:
         let
